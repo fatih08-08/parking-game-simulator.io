@@ -9,8 +9,8 @@ window.addEventListener('keyup',e=>{const k=KM[e.key];if(k){I[k]=0;pd({preventDe
 const canvas=document.getElementById('gc');
 const ctx=canvas.getContext('2d');
 let W,H;
-function resize(){const wr=document.getElementById('wrap');W=wr.clientWidth;H=wr.clientHeight;canvas.width=W;canvas.height=H;}
-window.addEventListener('resize',()=>{resize();if(GS==='playing')genLevel();});
+function resize(){applyCanvasDPR();}
+window.addEventListener('resize',()=>{applyCanvasDPR();if(GS==='playing')genLevel();});
 
 // ── STATE
 let GS='start',LVL=1,SCORE=0,LIVES=3,TIMER=60,tInt=null;
@@ -193,3 +193,22 @@ function addFloat(text,x,y,color='#f5c518',size=8){
     polisAlert: document.getElementById('polis-alert'),
     polisComboBadge: document.getElementById('polis-combo-badge')
   };
+
+  // Mobile / performance flags
+  const IS_MOBILE = /Mobi|Android|iPhone|iPad/.test(navigator.userAgent) || window.innerWidth<=720;
+  const DPR_CAP = IS_MOBILE? Math.min(window.devicePixelRatio||1, 1.25) : (window.devicePixelRatio||1);
+  const MAX_PARTS = IS_MOBILE? 20 : 35;
+  const MAX_TMARKS = IS_MOBILE? 60 : 120;
+
+  function applyCanvasDPR(){
+    const dpr = DPR_CAP;
+    const wr=document.getElementById('wrap');
+    W=wr.clientWidth; H=wr.clientHeight;
+    canvas.style.width = W+'px';
+    canvas.style.height = H+'px';
+    canvas.width = Math.floor(W*dpr);
+    canvas.height = Math.floor(H*dpr);
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+  }
+
+  function isMobile(){return IS_MOBILE;}

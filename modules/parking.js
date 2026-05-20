@@ -986,7 +986,7 @@ function update(){
       DRIFT_SCORE+=Math.floor(driftIntensity*speed_px*12);
       document.getElementById('driftbadge').classList.add('show');
       document.getElementById('driftbadge').textContent='🔥 DRİFT!';
-      if(AF%8===0&&parts.length<35){
+      if(AF% (isMobile()?12:8) ===0 && parts.length < (typeof MAX_PARTS!=='undefined'?MAX_PARTS:35)){
         const co=rcorners(car.x,car.y,car.angle,CW,CH);
         const wheels=DRIFT_DT==='fwd'?[0,1]:DRIFT_DT==='rwd'?[2,3]:[0,1,2,3];
         for(const wi of wheels){
@@ -1031,9 +1031,9 @@ function update(){
     if(DRIFT_ZONES.length>0&&DRIFT_ZONES.every(z=>z.hit)){car.parked=true;car.speed=0;triggerPark();}
     if(DOM.spd) DOM.spd.textContent=~~(speed_px*38);
     for(let i=parts.length-1;i>=0;i--){const p=parts[i];p.x+=p.vx;p.y+=p.vy;p.vx*=.90;p.vy*=.90;p.l-=p.d;if(p.l<=0)parts.splice(i,1);}
-    if(parts.length>35)parts.splice(0,parts.length-35);
+    if(parts.length> (typeof MAX_PARTS!=='undefined'?MAX_PARTS:35)) parts.splice(0,parts.length - (typeof MAX_PARTS!=='undefined'?MAX_PARTS:35));
     tmarks=tmarks.filter(t=>(t.l-=.010)>0);
-    if(tmarks.length>120)tmarks.length=120;
+    if(tmarks.length> (typeof MAX_TMARKS!=='undefined'?MAX_TMARKS:120)) tmarks.length = (typeof MAX_TMARKS!=='undefined'?MAX_TMARKS:120);
     if(cflash>0)cflash--;if(pflash>0)pflash--;
     if(COMBO_TIMER>0){COMBO_TIMER--;if(COMBO_TIMER===0){COMBO=0;document.getElementById('combobadge').classList.remove('show');}}
     return;
@@ -1103,7 +1103,7 @@ function update(){
     if(PS.parked1&&inSpot2()){car.parked=true;car.speed=0;triggerPark();}
   } else if(!car.crashed&&Math.abs(car.speed)<.28&&mode!==5&&inSpot()){car.parked=true;car.speed=0;triggerPark();}
   for(let i=parts.length-1;i>=0;i--){const p=parts[i];p.x+=p.vx;p.y+=p.vy;p.vx*=.91;p.vy*=.91;p.l-=p.d;if(p.l<=0)parts.splice(i,1);}
-  tmarks=tmarks.filter(t=>(t.l-=.004)>0);
+  tmarks=tmarks.filter(t=>(t.l-=.004)>0); if(tmarks.length> (typeof MAX_TMARKS!=='undefined'?MAX_TMARKS:120)) tmarks.length = (typeof MAX_TMARKS!=='undefined'?MAX_TMARKS:120);
   if(cflash>0)cflash--;if(pflash>0)pflash--;
   if(COMBO_TIMER>0){COMBO_TIMER--;if(COMBO_TIMER===0){COMBO=0;document.getElementById('combobadge').classList.remove('show');}}
   if(DOM.spd) DOM.spd.textContent=~~(Math.abs(car.speed)*38);

@@ -73,7 +73,7 @@ function drawPolisPlayer(){
   const p=POLIS_PLAYER;
   const dg=POLIS_DRIFT_ACTIVE&&POLIS_DRIFT_INTENSITY>0.15;
   drawCar(p.x,p.y,p.angle,p.color,p.roof,1,true,dg);
-  if(dg&&POLIS_AF%6===0&&POLIS_PARTS.length<50){
+  if(dg&&POLIS_AF%(isMobile()?10:6)===0&&POLIS_PARTS.length < (typeof MAX_PARTS!=='undefined'?MAX_PARTS:50)){
     const co=rcorners(p.x,p.y,p.angle,CW,CH);
     for(const wi of[2,3]){
       const sa=Math.atan2(p.vy,p.vx)+Math.PI+(Math.random()-.5)*1.4;
@@ -272,7 +272,7 @@ function updatePolisLoop(){
   for(let i=POLIS_PARTS.length-1;i>=0;i--){
     const p=POLIS_PARTS[i];p.x+=p.vx;p.y+=p.vy;p.vx*=.90;p.vy*=.90;p.l-=p.d; if(p.l<=0)POLIS_PARTS.splice(i,1);
   }
-  if(POLIS_PARTS.length>60)POLIS_PARTS.splice(0,POLIS_PARTS.length-60);
+  if(POLIS_PARTS.length > (typeof MAX_PARTS!=='undefined'?MAX_PARTS:60)) POLIS_PARTS.splice(0,POLIS_PARTS.length - (typeof MAX_PARTS!=='undefined'?MAX_PARTS:60));
   POLIS_TMARKS=POLIS_TMARKS.filter(t=>(t.l-=.012)>0);
   if(POLIS_TMARKS.length>40)POLIS_TMARKS.length=40;
   if(POLIS_AF%4===0) updPolisHUD();
