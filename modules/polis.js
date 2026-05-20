@@ -239,7 +239,7 @@ function updatePolisLoop(){
   POLIS_AF++;
   POLIS_SCORE_TICK++;
   if(POLIS_SCORE_TICK%30===0){POLIS_SCORE+=POLIS_COMBO;}
-  if(POLIS_COMBO_TIMER>0){POLIS_COMBO_TIMER--; if(POLIS_COMBO_TIMER===0){POLIS_COMBO=1;document.getElementById('polis-combo-badge').classList.remove('show');}}
+  if(POLIS_COMBO_TIMER>0){POLIS_COMBO_TIMER--; if(POLIS_COMBO_TIMER===0){POLIS_COMBO=1; if(DOM.polisComboBadge) DOM.polisComboBadge.classList.remove('show');}}
   POLIS_SPAWN_TIMER++;
   if(POLIS_SPAWN_TIMER>=POLIS_SPAWN_INTERVAL){
     POLIS_SPAWN_TIMER=0;
@@ -262,7 +262,7 @@ function updatePolisLoop(){
   POLIS_NEARBY_COUNT=nearbyCount;
   if(POLIS_ALERT_TIMER>0){
     POLIS_ALERT_TIMER--;
-    document.getElementById('polis-alert').classList.toggle('show',POLIS_ALERT_TIMER>0);
+    if(DOM.polisAlert) DOM.polisAlert.classList.toggle('show',POLIS_ALERT_TIMER>0);
   }
   updatePolisPlayer();
   updatePolisAI();
@@ -337,10 +337,10 @@ function drawPolisLoop(){
 }
 
 function updPolisHUD(){
-  document.getElementById('polis-score-val').textContent=POLIS_SCORE;
-  document.getElementById('polis-hi-val').textContent=POLIS_HIGHSCORE;
-  document.getElementById('polis-combo-val').textContent='x'+POLIS_COMBO;
-  document.getElementById('polis-count-val').textContent=POLIS_CARS.length;
+  if(DOM.polisScore) DOM.polisScore.textContent=POLIS_SCORE;
+  if(DOM.polisHi) DOM.polisHi.textContent=POLIS_HIGHSCORE;
+  if(DOM.polisCombo) DOM.polisCombo.textContent='x'+POLIS_COMBO;
+  if(DOM.polisCount) DOM.polisCount.textContent=POLIS_CARS.length;
 }
 
 function triggerPolisCaught(){

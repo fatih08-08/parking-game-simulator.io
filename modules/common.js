@@ -164,3 +164,32 @@ function addFloat(text,x,y,color='#f5c518',size=8){
     cp.appendChild(btn);
   });
 })();
+
+  // Cache frequently used DOM elements to avoid repeated lookups in render/update loops
+  const DOM = {
+    sd: document.getElementById('sd'),
+    ld: document.getElementById('ld'),
+    livd: document.getElementById('livd'),
+    td: document.getElementById('td'),
+    tfill: document.getElementById('tfill'),
+    spd: document.getElementById('spd'),
+    driftscore: document.getElementById('driftscore'),
+    driftbarLabel: document.getElementById('driftbar-label'),
+    driftbarFill: document.getElementById('driftbar-fill'),
+    driftbadge: document.getElementById('driftbadge'),
+    dtbadge: document.getElementById('dtbadge'),
+    daytint: document.getElementById('daytint'),
+    lanewarn: document.getElementById('lanewarn'),
+    hud: document.getElementById('hud'),
+    ctrl: document.getElementById('ctrl'),
+    keybadge: document.getElementById('keybadge'),
+    combobadge: document.getElementById('combobadge'),
+    crm: document.getElementById('crm'),
+    tbarFill: document.getElementById('tfill'),
+    polisScore: document.getElementById('polis-score-val'),
+    polisHi: document.getElementById('polis-hi-val'),
+    polisCombo: document.getElementById('polis-combo-val'),
+    polisCount: document.getElementById('polis-count-val'),
+    polisAlert: document.getElementById('polis-alert'),
+    polisComboBadge: document.getElementById('polis-combo-badge')
+  };

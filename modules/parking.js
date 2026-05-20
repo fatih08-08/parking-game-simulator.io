@@ -106,14 +106,13 @@ function startGame(mode){
   SCORE=0;LIVES=3;LVL=1;GS='playing';
   car.color=CHOSEN_COLOR;car.roof=shade(CHOSEN_COLOR,-42);
   showScreen('sto',false);
-  const dtel=document.getElementById('dtbadge');
+  const dtel=DOM.dtbadge;
   if(GAME_MODE==='drift'){
-    dtel.textContent=DRIFT_DT.toUpperCase();dtel.classList.add('show');
-    const dt=document.getElementById('daytint');
-    dt.classList.toggle('show',DRIFT_TOD==='day');
+    if(dtel) { dtel.textContent=DRIFT_DT.toUpperCase(); dtel.classList.add('show'); }
+    DOM.daytint.classList.toggle('show',DRIFT_TOD==='day');
   } else {
-    dtel.classList.remove('show');
-    document.getElementById('daytint').classList.remove('show');
+    if(dtel) dtel.classList.remove('show');
+    DOM.daytint.classList.remove('show');
   }
   resize();genLevel();startTimer();if(!raf)loop();
 }
@@ -121,21 +120,21 @@ function startGame(mode){
 function nextLevel(){
   LVL++;GS='playing';
   ['luo','cro','goo','rwo'].forEach(x=>showScreen(x,false));
-  document.getElementById('lanewarn').classList.remove('show');
+  DOM.lanewarn.classList.remove('show');
   genLevel();startTimer();
 }
 
 function restartLevel(){
   GS='playing';
   showScreen('cro',false);
-  document.getElementById('lanewarn').classList.remove('show');
+  DOM.lanewarn.classList.remove('show');
   genLevel();startTimer();
 }
 
 function restartGame(){
   SCORE=0;LIVES=3;LVL=1;GS='playing';COMBO=0;
   ['luo','cro','goo','rwo'].forEach(x=>showScreen(x,false));
-  document.getElementById('lanewarn').classList.remove('show');
+  DOM.lanewarn.classList.remove('show');
   resize();genLevel();startTimer();
 }
 
@@ -146,14 +145,12 @@ function closeReward(){
 }
 
 function updHUD(){
-  document.getElementById('sd').textContent=SCORE;
-  document.getElementById('ld').textContent=LVL;
-  document.getElementById('livd').textContent='❤'.repeat(Math.max(0,LIVES))+'🖤'.repeat(Math.max(0,3-LIVES));
-  document.getElementById('gom').textContent=`Skor: ${SCORE} | LVL: ${LVL}`;
+  if(DOM.sd) DOM.sd.textContent=SCORE;
+  if(DOM.ld) DOM.ld.textContent=LVL;
+  if(DOM.livd) DOM.livd.textContent='❤'.repeat(Math.max(0,LIVES))+'🖤'.repeat(Math.max(0,3-LIVES));
+  const gom=document.getElementById('gom'); if(gom) gom.textContent=`Skor: ${SCORE} | LVL: ${LVL}`;
   if(COMBO>1){
-    const cb=document.getElementById('combobadge');
-    cb.textContent=`🔥 COMBO x${COMBO}`;
-    cb.classList.add('show');
+    if(DOM.combobadge){ DOM.combobadge.textContent=`🔥 COMBO x${COMBO}`; DOM.combobadge.classList.add('show'); }
     COMBO_TIMER=180;
   }
 }
@@ -274,8 +271,8 @@ function genLevel(){
   document.getElementById('driftbar-wrap').className=isDriftMode?'show':'';
   document.getElementById('driftmode-overlay').className=isDriftMode?'show':'';
   if(!isDriftMode){
-    document.getElementById('driftbadge').classList.remove('show');
-    document.getElementById('driftscore').classList.remove('show');
+    if(DOM.driftbadge) DOM.driftbadge.classList.remove('show');
+    if(DOM.driftscore) DOM.driftscore.classList.remove('show');
   }
   if(mode===2){
     genLanePath(false);
@@ -901,7 +898,7 @@ function draw(){
     if(DRIFT_TOD==='night'){
       ctx.fillStyle='rgba(0,0,4,0.18)';ctx.fillRect(0,0,W,H);
     }
-    const ds=document.getElementById('driftscore');
+    const ds=DOM.driftscore;
     if(DRIFT_ACTIVE && DRIFT_SCORE>0){
       ds.textContent=`🔥 +${DRIFT_SCORE}`;
       ds.classList.add('show');
@@ -911,19 +908,20 @@ function draw(){
     const totalZones=Math.max(1,DRIFT_ZONES.length);
     const pct=Math.min(100,(DRIFT_ZONE_HITS/totalZones)*100);
     const label=`ZONE: ${DRIFT_ZONE_HITS}/${totalZones}`;
-    if(label!==lastDriftLabel){document.getElementById('driftbar-label').textContent=label;lastDriftLabel=label;}
+    if(label!==lastDriftLabel){ if(DOM.driftbarLabel) DOM.driftbarLabel.textContent=label; lastDriftLabel=label; }
     if(pct!==lastDriftBarPct){
-      const fill=document.getElementById('driftbar-fill');
-      fill.style.width=pct+'%';
-      fill.style.background=
-        pct>=100?'linear-gradient(90deg,#00ff88,#00ffcc)':
-        pct>=60 ?'linear-gradient(90deg,#ff9900,#ff3e6c)':
-                 'linear-gradient(90deg,#ff6600,#ff3e6c)';
+      if(DOM.driftbarFill){
+        DOM.driftbarFill.style.width=pct+'%';
+        DOM.driftbarFill.style.background=
+          pct>=100?'linear-gradient(90deg,#00ff88,#00ffcc)':
+          pct>=60 ?'linear-gradient(90deg,#ff9900,#ff3e6c)':
+                   'linear-gradient(90deg,#ff6600,#ff3e6c)';
+      }
       lastDriftBarPct=pct;
     }
-    const dtEl=document.getElementById('dtbadge');
+    const dtEl=DOM.dtbadge;
     const dtCol={fwd:'#00ccff',rwd:'#ff3e6c',awd:'#00ff88','4wd':'#f5c518'}[DRIFT_DT]||'#ff6600';
-    if(dtCol!==lastDriftBadgeColor){dtEl.style.color=dtCol;dtEl.style.textShadow=`0 0 8px ${dtCol}`;lastDriftBadgeColor=dtCol;}
+    if(dtEl && dtCol!==lastDriftBadgeColor){dtEl.style.color=dtCol;dtEl.style.textShadow=`0 0 8px ${dtCol}`;lastDriftBadgeColor=dtCol;}
   }
   if(cflash>0){ctx.fillStyle=`rgba(255,45,20,${cflash*.038})`;ctx.fillRect(0,0,W,H);}  
   if(pflash>0){ctx.fillStyle=`rgba(0,255,175,${pflash*.032})`;ctx.fillRect(0,0,W,H);}  
@@ -1031,7 +1029,7 @@ function update(){
       }
     }
     if(DRIFT_ZONES.length>0&&DRIFT_ZONES.every(z=>z.hit)){car.parked=true;car.speed=0;triggerPark();}
-    document.getElementById('spd').textContent=~~(speed_px*38);
+    if(DOM.spd) DOM.spd.textContent=~~(speed_px*38);
     for(let i=parts.length-1;i>=0;i--){const p=parts[i];p.x+=p.vx;p.y+=p.vy;p.vx*=.90;p.vy*=.90;p.l-=p.d;if(p.l<=0)parts.splice(i,1);}
     if(parts.length>35)parts.splice(0,parts.length-35);
     tmarks=tmarks.filter(t=>(t.l-=.010)>0);
@@ -1108,7 +1106,7 @@ function update(){
   tmarks=tmarks.filter(t=>(t.l-=.004)>0);
   if(cflash>0)cflash--;if(pflash>0)pflash--;
   if(COMBO_TIMER>0){COMBO_TIMER--;if(COMBO_TIMER===0){COMBO=0;document.getElementById('combobadge').classList.remove('show');}}
-  document.getElementById('spd').textContent=~~(Math.abs(car.speed)*38);
+  if(DOM.spd) DOM.spd.textContent=~~(Math.abs(car.speed)*38);
 }
 
 function spawnCrash(x,y){
