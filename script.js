@@ -9,7 +9,7 @@ window.addEventListener('keyup',  e=>{const k=KM[e.key];if(k){I[k]=0;pd({prevent
 const canvas=document.getElementById('gc');
 const ctx=canvas.getContext('2d');
 let W,H;
-function resize(){const wr=document.getElementById('wrap');W=wr.clientWidth;H=wr.clientHeight;canvas.width=W;canvas.height=H;}
+function resize(){const wr=document.getElementById('wrap');W=wr.clientWidth;H=wr.clientHeight;canvas.width=W;canvas.height=H;BG_CACHE_KEY='';}
 window.addEventListener('resize',()=>{resize();if(GS==='playing')genLevel();});
 
 // ── STATE
@@ -61,6 +61,12 @@ const DT_PRESETS={
 let DRIFT_SCORE=0,DRIFT_ACTIVE=false,DRIFT_TIMER=0,DRIFT_TOTAL=0;
 let car_vx=0,car_vy=0; // velocity vector for drift physics
 let DRIFT_ZONES=[]; // drift zone targets in free mode
+let DRIFT_ZONE_HITS=0;
+let lastDriftBarPct=-1;
+let lastDriftLabel='';
+let lastDriftBadgeColor='';
+let BG_CACHE_KEY='';
+let POLIS_NEARBY_COUNT=0;
 
 // Car
 const CW=22,CH=36;
@@ -350,7 +356,7 @@ function genLevel(){
   PS2=null;
   // Drift reset
   DRIFT_SCORE=0;DRIFT_ACTIVE=false;DRIFT_TIMER=0;DRIFT_TOTAL=0;
-  car_vx=0;car_vy=0;DRIFT_ZONES=[];
+  car_vx=0;car_vy=0;DRIFT_ZONES=[];DRIFT_ZONE_HITS=0;lastDriftBarPct=-1;lastDriftLabel='';lastDriftBadgeColor='';BG_CACHE_KEY='';
   // Renk CHOSEN_COLOR ile sabit
   car.color=CHOSEN_COLOR; car.roof=shade(CHOSEN_COLOR,-42);
   LANE_PATH=[]; CARPARK_WALLS=[]; CARPARK_SPOTS=[];
@@ -625,6 +631,7 @@ function genLevel(){
       while(dist(zx,zy,car.x,car.y)<90&&zt<30);
       DRIFT_ZONES.push({x:zx,y:zy,r:28+Math.random()*22,hit:false,pulse:Math.random()*Math.PI*2,val:200+LVL*30});
     }
+    DRIFT_ZONE_HITS=0;
 
   } else {
     // Normal mod (0)
@@ -911,7 +918,7 @@ function drawNightBG(){
   ctx.fillStyle='#020208';ctx.fillRect(0,0,W,H);
   // Yıldızlar — statik
   ctx.fillStyle='#ffffff';
-  for(let i=0;i<30;i++){ctx.fillRect(Math.sin(i*37)*W*.5+W*.5,Math.cos(i*19)*H*.3+H*.15,1,1);}
+  for(let i=0;i<18;i++){ctx.fillRect(Math.sin(i*37)*W*.5+W*.5,Math.cos(i*19)*H*.3+H*.15,1,1);}
   // Sokak lambası ışıkları (sadece birkaç nokta)
   const lampX=[W*.2,W*.5,W*.8];
   lampX.forEach(lx=>{
@@ -936,8 +943,8 @@ function drawIceBG(){
   // Kaygan zemin (kar/buz efekti)
   ctx.fillStyle='#c8d8e8';ctx.fillRect(0,0,W,H);
   ctx.strokeStyle='#b0c4d4';ctx.lineWidth=1;
-  for(let x=0;x<W;x+=20){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
-  for(let y=0;y<H;y+=20){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+  for(let x=0;x<W;x+=28){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+  for(let y=0;y<H;y+=28){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
   // Ice cracks — statik, her frame üretme
   if(!_iceCracks||_iceCracks.W!==W){
     _iceCracks={W,lines:[]};
@@ -987,8 +994,8 @@ function drawDriftBG_night_carpark(){
   g.addColorStop(0,'#1a1a28');g.addColorStop(1,'#0f0f1c');
   ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
   ctx.strokeStyle='#ffffff07';ctx.lineWidth=1;
-  for(let x=0;x<W;x+=38){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
-  for(let y=0;y<H;y+=38){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+  for(let x=0;x<W;x+=52){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+  for(let y=0;y<H;y+=52){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
   ctx.fillStyle='#999';ctx.fillRect(0,0,W,5);ctx.fillRect(0,H-5,W,5);ctx.fillRect(0,0,5,H);ctx.fillRect(W-5,0,5,H);
   ctx.fillStyle='#f5c518';for(let i=0;i<W;i+=14){ctx.fillRect(i,0,7,5);ctx.fillRect(i,H-5,7,5);}
   for(let i=0;i<H;i+=14){ctx.fillRect(0,i,5,7);ctx.fillRect(W-5,i,5,7);}
@@ -1049,11 +1056,11 @@ function drawNormalBG(mode){
   ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
   // Asphalt grid
   ctx.strokeStyle='#ffffff07';ctx.lineWidth=1;
-  for(let x=0;x<W;x+=38){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
-  for(let y=0;y<H;y+=38){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+  for(let x=0;x<W;x+=48){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+  for(let y=0;y<H;y+=48){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
   // Asphalt texture — statik (Math.random yok)
   ctx.fillStyle='#ffffff04';
-  for(let i=0;i<40;i++){ctx.fillRect(Math.sin(i*17)*W*.5+W*.5,Math.sin(i*13)*H*.4+H*.3,((i*37)%50)+10,1);}
+  for(let i=0;i<24;i++){ctx.fillRect(Math.sin(i*17)*W*.5+W*.5,Math.sin(i*13)*H*.4+H*.3,((i*37)%42)+8,1);}
   // Bay lines for L-park/reverse
   if(mode===3||mode===4||mode===5){
     ctx.strokeStyle='#ffffff18';ctx.lineWidth=1;
@@ -1188,18 +1195,22 @@ function draw(){
       ds.classList.remove('show');
     }
     // Drift bar — sadece zone değişince güncelle (DOM throttle)
-    const hitCount=DRIFT_ZONES.filter(z=>z.hit).length;
     const totalZones=Math.max(1,DRIFT_ZONES.length);
-    const pct=Math.min(100,(hitCount/totalZones)*100);
-    document.getElementById('driftbar-label').textContent=`ZONE: ${hitCount}/${totalZones}`;
-    document.getElementById('driftbar-fill').style.width=pct+'%';
-    document.getElementById('driftbar-fill').style.background=
-      pct>=100?'linear-gradient(90deg,#00ff88,#00ffcc)':
-      pct>=60 ?'linear-gradient(90deg,#ff9900,#ff3e6c)':
-               'linear-gradient(90deg,#ff6600,#ff3e6c)';
+    const pct=Math.min(100,(DRIFT_ZONE_HITS/totalZones)*100);
+    const label=`ZONE: ${DRIFT_ZONE_HITS}/${totalZones}`;
+    if(label!==lastDriftLabel){document.getElementById('driftbar-label').textContent=label;lastDriftLabel=label;}
+    if(pct!==lastDriftBarPct){
+      const fill=document.getElementById('driftbar-fill');
+      fill.style.width=pct+'%';
+      fill.style.background=
+        pct>=100?'linear-gradient(90deg,#00ff88,#00ffcc)':
+        pct>=60 ?'linear-gradient(90deg,#ff9900,#ff3e6c)':
+                 'linear-gradient(90deg,#ff6600,#ff3e6c)';
+      lastDriftBarPct=pct;
+    }
     const dtEl=document.getElementById('dtbadge');
     const dtCol={fwd:'#00ccff',rwd:'#ff3e6c',awd:'#00ff88','4wd':'#f5c518'}[DRIFT_DT]||'#ff6600';
-    dtEl.style.color=dtCol;dtEl.style.textShadow=`0 0 8px ${dtCol}`;
+    if(dtCol!==lastDriftBadgeColor){dtEl.style.color=dtCol;dtEl.style.textShadow=`0 0 8px ${dtCol}`;lastDriftBadgeColor=dtCol;}
   }
 
   if(cflash>0){ctx.fillStyle=`rgba(255,45,20,${cflash*.038})`;ctx.fillRect(0,0,W,H);}
@@ -1316,7 +1327,7 @@ function update(){
       // Zone: drift yaparken içinden geç → say
       for(const z of DRIFT_ZONES){
         if(!z.hit&&dist(car.x,car.y,z.x,z.y)<z.r+18){
-          z.hit=true;
+          z.hit=true;DRIFT_ZONE_HITS++;
           const zBonus=z.val+Math.floor(DRIFT_SCORE*0.5);
           SCORE+=zBonus;DRIFT_TOTAL+=zBonus;
           spawnPark(z.x,z.y);addFloat(`⭐ ZONE! +${zBonus}`,z.x,z.y-30,'#ffff00',10);updHUD();
@@ -1699,7 +1710,7 @@ function drawPolisWorld(){
   // Zemin + ızgara — park modundaki sade stil
   ctx.fillStyle='#1a1a28'; ctx.fillRect(visL,visT,visR-visL,visB-visT);
   ctx.strokeStyle='#ffffff07'; ctx.lineWidth=1;
-  const lineSpacing=200;
+  const lineSpacing=230;
   const lx0=Math.floor(visL/lineSpacing)*lineSpacing;
   const ly0=Math.floor(visT/lineSpacing)*lineSpacing;
   ctx.beginPath();
@@ -1737,7 +1748,7 @@ function drawPolisPlayer(){
   const dg=POLIS_DRIFT_ACTIVE&&POLIS_DRIFT_INTENSITY>0.15;
   drawCar(p.x,p.y,p.angle,p.color,p.roof,1,true,dg);
   // Drift smoke
-  if(dg&&POLIS_AF%6===0&&POLIS_PARTS.length<70){
+  if(dg&&POLIS_AF%6===0&&POLIS_PARTS.length<50){
     const co=rcorners(p.x,p.y,p.angle,CW,CH);
     for(const wi of[2,3]){
       const sa=Math.atan2(p.vy,p.vx)+Math.PI+(Math.random()-.5)*1.4;
@@ -1895,7 +1906,9 @@ function updatePolisAI(){
     // Collision with player
     if(!car.crashed){
       const sc=pc.type==='suv'?1.25:1.0;
-      if(sat(rcorners(p.x,p.y,p.angle,CW,CH),rcorners(pc.x,pc.y,pc.angle,CW*sc,CH*sc))){
+      const dx=p.x-pc.x, dy=p.y-pc.y;
+      const minR=(CW/2 + CW*sc/2)*0.9;
+      if(dx*dx+dy*dy < minR*minR && sat(rcorners(p.x,p.y,p.angle,CW,CH),rcorners(pc.x,pc.y,pc.angle,CW*sc,CH*sc))){
         triggerPolisCaught();
       }
     }
@@ -1976,9 +1989,15 @@ function updatePolisLoop(){
   // Siren effect
   POLIS_SIREN_TICK++;
   if(POLIS_SIREN_TICK%8===0){POLIS_SIREN_STATE=(POLIS_SIREN_STATE+1)%2;}
-  if(POLIS_CARS.some(pc=>Math.hypot(pc.x-POLIS_PLAYER.x,pc.y-POLIS_PLAYER.y)<350)){
-    POLIS_ALERT_TIMER=60;
+  let nearbyCount=0;
+  const px=POLIS_PLAYER.x, py=POLIS_PLAYER.y;
+  for(const pc of POLIS_CARS){
+    const dx=pc.x-px, dy=pc.y-py;
+    const dist2=dx*dx+dy*dy;
+    if(dist2<350*350) POLIS_ALERT_TIMER=60;
+    if(dist2<500*500) nearbyCount++;
   }
+  POLIS_NEARBY_COUNT=nearbyCount;
 
   if(POLIS_ALERT_TIMER>0){
     POLIS_ALERT_TIMER--;
@@ -1999,14 +2018,14 @@ function updatePolisLoop(){
     const p=POLIS_PARTS[i];p.x+=p.vx;p.y+=p.vy;p.vx*=.90;p.vy*=.90;p.l-=p.d;
     if(p.l<=0)POLIS_PARTS.splice(i,1);
   }
-  if(POLIS_PARTS.length>80)POLIS_PARTS.splice(0,POLIS_PARTS.length-80);
+  if(POLIS_PARTS.length>60)POLIS_PARTS.splice(0,POLIS_PARTS.length-60);
 
   // Tire marks
   POLIS_TMARKS=POLIS_TMARKS.filter(t=>(t.l-=.012)>0);
-  if(POLIS_TMARKS.length>60)POLIS_TMARKS.length=60;
+  if(POLIS_TMARKS.length>40)POLIS_TMARKS.length=40;
 
-  // HUD
-  updPolisHUD();
+  // HUD (throttled)
+  if(POLIS_AF%4===0) updPolisHUD();
 }
 
 function drawPolisLoop(){
@@ -2021,7 +2040,7 @@ function drawPolisLoop(){
     const streakLen=8+spd*3;
     const sa=-Math.sin(POLIS_PLAYER.angle)*streakLen, ca=Math.cos(POLIS_PLAYER.angle)*streakLen;
     ctx.beginPath();
-    for(let i=0;i<6;i++){const sx=Math.random()*W,sy=Math.random()*H;ctx.moveTo(sx,sy);ctx.lineTo(sx+sa,sy+ca);}
+    for(let i=0;i<4;i++){const sx=Math.random()*W,sy=Math.random()*H;ctx.moveTo(sx,sy);ctx.lineTo(sx+sa,sy+ca);}
     ctx.stroke();
     ctx.globalAlpha=1;
   }
@@ -2033,7 +2052,7 @@ function drawPolisLoop(){
   }
 
   // Police count indicator (top center)
-  const polisNear=POLIS_CARS.filter(pc=>Math.hypot(pc.x-POLIS_PLAYER.x,pc.y-POLIS_PLAYER.y)<500).length;
+  const polisNear=POLIS_NEARBY_COUNT;
   if(polisNear>0){
     ctx.save();
     ctx.fillStyle='rgba(0,0,0,0.55)';ctx.fillRect(W/2-55,56,110,22);
