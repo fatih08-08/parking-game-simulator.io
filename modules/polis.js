@@ -371,6 +371,7 @@ function startPolisMode(){
   POLIS_PLAYER={x:0,y:0,angle:Math.PI,speed:0.5,vx:0,vy:0,color:CHOSEN_COLOR,roof:shade(CHOSEN_COLOR,-42)};
   if(raf){cancelAnimationFrame(raf);raf=null;}
   clearInterval(tInt);
+  resize();
   document.getElementById('hud').style.display='none';
   document.getElementById('ctrl').style.display='none';
   document.getElementById('driftbar-wrap').className='';
