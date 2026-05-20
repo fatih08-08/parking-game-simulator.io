@@ -1,0 +1,31 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323:wght@400&display=swap');
+:root{
+  --neon:#00ffcc;--neon2:#ff3e6c;--neon3:#f5c518;--neon4:#a78bfa;
+  --bg:#05050a;--bg2:#0a0a1e;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;touch-action:none;}
+body{background:#000;font-family:'Press Start 2P',monospace;width:100vw;height:100dvh;overflow:hidden;display:flex;align-items:center;justify-content:center;}
+#wrap{position:relative;width:min(100vw,calc(100dvh*9/18));height:100dvh;background:var(--bg);overflow:hidden;}
+canvas{position:absolute;top:0;left:0;width:100%;height:100%;image-rendering:pixelated;image-rendering:crisp-edges;}
+
+/* Common animations */
+@keyframes pulse{from{opacity:.7}to{opacity:1}}
+@keyframes bp{0%,100%{box-shadow:0 0 8px currentColor}50%{box-shadow:0 0 24px currentColor,0 0 42px currentColor}}
+@keyframes kbounce{0%,100%{transform:scale(1)}50%{transform:scale(1.5)}}
+@keyframes camShake{
+  0%{transform:translate(0,0) rotate(0deg);}
+  15%{transform:translate(-3px,2px) rotate(-0.5deg);}
+  30%{transform:translate(3px,-2px) rotate(0.5deg);}
+  45%{transform:translate(-2px,3px) rotate(-0.3deg);}
+  60%{transform:translate(2px,-1px) rotate(0.3deg);}
+  75%{transform:translate(-1px,2px) rotate(-0.2deg);}
+  100%{transform:translate(0,0) rotate(0deg);}
+}
+#wrap.shake{animation:camShake 0.35s ease-out;}
+
+/* Base overlay */
+.ov{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#000000cc;z-index:100;gap:13px;backdrop-filter:blur(4px);}
+.ot{font-size:clamp(14px,4vw,22px);color:var(--neon);text-shadow:0 0 18px var(--neon),0 0 38px var(--neon);animation:pulse 1s infinite alternate;text-align:center;line-height:1.8;}
+.os{font-size:clamp(5.5px,1.6vw,8px);color:var(--neon3);text-align:center;line-height:2.4;max-width:280px;}
+.ob{padding:9px 20px;background:transparent;border:2px solid var(--neon);color:var(--neon);font-family:'Press Start 2P',monospace;font-size:clamp(7px,2vw,10px);cursor:pointer;box-shadow:0 0 12px var(--neon);animation:bp 1.5s infinite;transition:all .1s;}
+.ob:active{background:#00ffcc22;transform:scale(0.95);}

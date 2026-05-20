@@ -1,349 +1,3 @@
-<!DOCTYPE html>
-<html lang="tr">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>🚗 PARK USTASI PRO</title>
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323:wght@400&display=swap');
-:root{
-  --neon:#00ffcc;--neon2:#ff3e6c;--neon3:#f5c518;--neon4:#a78bfa;
-  --bg:#05050a;--bg2:#0a0a1e;
-}
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;touch-action:none;}
-body{background:#000;font-family:'Press Start 2P',monospace;width:100vw;height:100dvh;overflow:hidden;display:flex;align-items:center;justify-content:center;}
-#wrap{position:relative;width:min(100vw,calc(100dvh*9/18));height:100dvh;background:var(--bg);overflow:hidden;}
-canvas{position:absolute;top:0;left:0;width:100%;height:100%;image-rendering:pixelated;image-rendering:crisp-edges;}
-
-/* HUD */
-#hud{position:absolute;top:0;left:0;right:0;height:48px;display:flex;justify-content:space-around;align-items:center;background:linear-gradient(180deg,#0a0a1ef5,transparent);z-index:20;pointer-events:none;padding:0 6px;}
-.hi{display:flex;flex-direction:column;align-items:center;gap:1px;}
-.hl{font-size:4.5px;color:var(--neon);letter-spacing:1px;opacity:.8;}
-.hv{font-family:'VT323',monospace;font-size:20px;color:var(--neon3);text-shadow:0 0 7px var(--neon3);line-height:1;}
-#tbar{width:52px;height:3px;background:#ffffff22;}
-#tfill{height:100%;background:linear-gradient(90deg,var(--neon),var(--neon3));box-shadow:0 0 4px var(--neon);transition:width .1s;}
-
-/* Key badge */
-#keybadge{position:absolute;top:52px;right:8px;z-index:21;pointer-events:none;font-family:'VT323',monospace;font-size:22px;color:#f5c518;text-shadow:0 0 10px #f5c518;transition:transform .2s;}
-#keybadge.bounce{animation:kbounce .3s;}
-@keyframes kbounce{0%,100%{transform:scale(1)}50%{transform:scale(1.5)}}
-
-/* Mode badge */
-#modebadge{position:absolute;top:52px;left:8px;z-index:21;pointer-events:none;font-size:5px;color:var(--neon4);text-shadow:0 0 6px var(--neon4);letter-spacing:.5px;}
-
-/* Combo badge */
-#combobadge{position:absolute;top:70px;left:50%;transform:translateX(-50%);z-index:21;pointer-events:none;font-family:'VT323',monospace;font-size:18px;color:#ff6600;text-shadow:0 0 10px #ff6600;opacity:0;transition:opacity .3s;}
-#combobadge.show{opacity:1;}
-
-/* Controls */
-#ctrl{position:absolute;bottom:0;left:0;right:0;height:200px;z-index:20;display:flex;align-items:flex-end;justify-content:space-between;padding:0 16px 16px;background:linear-gradient(0deg,#05050af5 55%,transparent);}
-.bsteer{width:64px;height:64px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#1c2738,#08101c);border:2.5px solid var(--neon);color:var(--neon);font-size:18px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 12px #00ffcc44,inset 0 0 8px #00ffcc11;cursor:pointer;user-select:none;-webkit-user-select:none;transition:all .06s;}
-.bsteer.pressed{background:radial-gradient(circle at 35% 35%,#00ffcc22,#001812);box-shadow:0 0 26px #00ffccaa;border-color:#aaffee;transform:scale(0.89);}
-#sg{display:flex;flex-direction:row;gap:12px;align-items:flex-end;}
-#pg{display:flex;flex-direction:column;align-items:center;gap:9px;}
-.bgas{width:68px;height:120px;border-radius:10px 10px 16px 16px;background:linear-gradient(180deg,#1a080c,#280010);border:2.5px solid var(--neon2);color:var(--neon2);font-family:'Press Start 2P',monospace;font-size:7px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:10px;gap:5px;box-shadow:0 0 14px #ff3e6c44,inset 0 0 10px #ff3e6c0e;cursor:pointer;user-select:none;-webkit-user-select:none;transition:all .06s;position:relative;overflow:hidden;}
-.bgas::after{content:'';position:absolute;top:8px;left:10px;width:55%;height:22%;background:radial-gradient(ellipse,#ff3e6c1a,transparent);border-radius:50%;}
-.bgas .ico{font-size:24px;line-height:1;}
-.bgas.pressed{background:linear-gradient(180deg,#ff3e6c2a,#380010);box-shadow:0 0 30px #ff3e6caa;border-color:#ff9999;transform:scale(0.92) translateY(3px);}
-.bbrake{width:68px;height:58px;border-radius:8px 8px 14px 14px;background:linear-gradient(180deg,#181200,#201800);border:2.5px solid var(--neon3);color:var(--neon3);font-family:'Press Start 2P',monospace;font-size:7px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:8px;gap:3px;box-shadow:0 0 12px #f5c51844,inset 0 0 8px #f5c5180e;cursor:pointer;user-select:none;-webkit-user-select:none;transition:all .06s;position:relative;overflow:hidden;}
-.bbrake::after{content:'';position:absolute;top:5px;left:8px;width:55%;height:28%;background:radial-gradient(ellipse,#f5c5181a,transparent);border-radius:50%;}
-.bbrake .ico{font-size:16px;line-height:1;}
-.bbrake.pressed{background:linear-gradient(180deg,#f5c51824,#2a1c00);box-shadow:0 0 26px #f5c518aa;border-color:#ffe877;transform:scale(0.92) translateY(3px);}
-.plbl{font-size:6px;letter-spacing:0.4px;}
-
-/* Overlays */
-.ov{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#000000cc;z-index:100;gap:13px;backdrop-filter:blur(4px);}
-.ot{font-size:clamp(14px,4vw,22px);color:var(--neon);text-shadow:0 0 18px var(--neon),0 0 38px var(--neon);animation:pulse 1s infinite alternate;text-align:center;line-height:1.8;}
-.os{font-size:clamp(5.5px,1.6vw,8px);color:var(--neon3);text-align:center;line-height:2.4;max-width:280px;}
-.ob{padding:9px 20px;background:transparent;border:2px solid var(--neon);color:var(--neon);font-family:'Press Start 2P',monospace;font-size:clamp(7px,2vw,10px);cursor:pointer;box-shadow:0 0 12px var(--neon);animation:bp 1.5s infinite;transition:all .1s;}
-.ob:active{background:#00ffcc22;transform:scale(0.95);}
-#luo .ot{color:var(--neon3);text-shadow:0 0 18px var(--neon3),0 0 38px var(--neon3);}
-#luo .ob{border-color:var(--neon3);color:var(--neon3);box-shadow:0 0 12px var(--neon3);}
-#cro .ot{color:var(--neon2);text-shadow:0 0 18px var(--neon2),0 0 38px var(--neon2);}
-#cro .ob{border-color:var(--neon2);color:var(--neon2);}
-#goo .ot{color:var(--neon2);text-shadow:0 0 18px var(--neon2),0 0 38px var(--neon2);}
-#goo .ob{border-color:var(--neon2);color:var(--neon2);}
-#rwo .ot{color:var(--neon4);text-shadow:0 0 18px var(--neon4),0 0 38px var(--neon4);}
-#rwo .ob{border-color:var(--neon4);color:var(--neon4);box-shadow:0 0 12px var(--neon4);}
-.stars{font-size:22px;display:flex;gap:7px;}
-.key-collect-msg{font-size:8px;color:#f5c518;text-shadow:0 0 10px #f5c518;animation:kpop .6s forwards;}
-@keyframes kpop{0%{opacity:1;transform:translateY(0) scale(1.5)}100%{opacity:0;transform:translateY(-40px) scale(1)}}
-@keyframes pulse{from{opacity:.7}to{opacity:1}}
-@keyframes bp{0%,100%{box-shadow:0 0 8px currentColor}50%{box-shadow:0 0 24px currentColor,0 0 42px currentColor}}
-
-/* Lane warning */
-#lanewarn{position:absolute;top:52px;left:50%;transform:translateX(-50%);z-index:25;pointer-events:none;font-size:7px;color:#ff3e6c;text-shadow:0 0 8px #ff3e6c;opacity:0;transition:opacity .2s;text-align:center;}
-#lanewarn.show{opacity:1;}
-
-/* Car color picker */
-#colorpicker{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;max-width:220px;}
-.cpbtn{width:24px;height:24px;border-radius:50%;border:2px solid transparent;cursor:pointer;transition:all .15s;}
-.cpbtn.selected{border-color:#fff;transform:scale(1.25);box-shadow:0 0 10px #fff8;}
-.cpbtn:active{transform:scale(0.9);}
-
-/* Difficulty badge */
-#diffbadge{position:absolute;top:52px;right:8px;z-index:21;pointer-events:none;}
-
-/* Level type label */
-#lvltypelabel{position:absolute;top:0;left:0;right:0;height:48px;pointer-events:none;z-index:19;display:flex;align-items:center;justify-content:center;}
-
-/* Drift mode */
-#driftbadge{position:absolute;top:52px;left:50%;transform:translateX(-50%);z-index:22;pointer-events:none;font-family:'VT323',monospace;font-size:26px;color:#ff3e6c;text-shadow:0 0 16px #ff3e6c,0 0 32px #ff006644;opacity:0;transition:opacity .2s;letter-spacing:2px;}
-#driftbadge.show{opacity:1;animation:driftpulse .4s infinite alternate;}
-@keyframes driftpulse{from{text-shadow:0 0 10px #ff3e6c}to{text-shadow:0 0 30px #ff3e6c,0 0 60px #ff006688}}
-#driftscore{position:absolute;top:76px;left:50%;transform:translateX(-50%);z-index:22;pointer-events:none;font-family:'VT323',monospace;font-size:20px;color:#ff6600;text-shadow:0 0 10px #ff6600;opacity:0;transition:opacity .3s;}
-#driftscore.show{opacity:1;}
-#driftbar-wrap{position:absolute;bottom:212px;left:50%;transform:translateX(-50%);z-index:22;pointer-events:none;width:120px;display:none;flex-direction:column;align-items:center;gap:2px;}
-#driftbar-wrap.show{display:flex;}
-#driftbar-label{font-size:5px;color:#ff3e6c;letter-spacing:1px;}
-#driftbar{width:100%;height:5px;background:#ffffff15;border-radius:3px;}
-#driftbar-fill{height:100%;background:linear-gradient(90deg,#ff6600,#ff3e6c);border-radius:3px;width:0%;transition:width .1s;box-shadow:0 0 6px #ff3e6c;}
-#driftmode-overlay{position:absolute;inset:0;pointer-events:none;z-index:18;opacity:0;transition:opacity .5s;background:radial-gradient(ellipse at 50% 100%,#ff006611 0%,transparent 70%);}
-#driftmode-overlay.show{opacity:1;}
-.bhandbrake{width:68px;height:68px;border-radius:10px;background:linear-gradient(180deg,#1a0a0a,#280000);border:2.5px solid #ff3e6c;color:#ff3e6c;font-family:'Press Start 2P',monospace;font-size:6px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:8px;gap:4px;box-shadow:0 0 14px #ff3e6c44,inset 0 0 10px #ff3e6c0e;cursor:pointer;user-select:none;-webkit-user-select:none;transition:all .06s;position:relative;}
-.bhandbrake .ico{font-size:22px;line-height:1;}
-.bhandbrake.pressed{background:linear-gradient(180deg,#ff3e6c2a,#380000);box-shadow:0 0 30px #ff3e6caa;border-color:#ff9999;transform:scale(0.92) translateY(3px);}
-
-/* Selection option buttons */
-.selopt{background:transparent;border:1.5px solid #ff3e6c44;color:#ff3e6c88;font-family:'Press Start 2P',monospace;font-size:6px;padding:7px 10px;cursor:pointer;transition:all .12s;line-height:1.6;text-align:center;min-width:68px;}
-.selopt:active{transform:scale(0.93);}
-.selopt.active{border-color:#ff3e6c;color:#ff3e6c;background:#ff3e6c18;box-shadow:0 0 12px #ff3e6c66;}
-.dtbtn{min-width:52px;font-size:5.5px;}
-
-/* Drivetrain HUD badge */
-#dtbadge{position:absolute;bottom:215px;right:10px;z-index:22;pointer-events:none;font-family:'VT323',monospace;font-size:16px;color:#ff6600;text-shadow:0 0 8px #ff6600;opacity:0;}
-#dtbadge.show{opacity:1;}
-/* Day sky tint */
-#daytint{position:absolute;inset:0;pointer-events:none;z-index:17;opacity:0;background:linear-gradient(180deg,#87ceeb22 0%,transparent 40%);transition:opacity .5s;}
-#daytint.show{opacity:1;}
-
-/* POLİSLER button */
-@keyframes polisGlow{
-  0%{box-shadow:0 0 16px #ff2222,0 0 32px #0044ff,inset 0 0 12px #ff000022;border-color:#ff3333;}
-  25%{box-shadow:0 0 24px #0044ff,0 0 48px #ff2222,inset 0 0 18px #0044ff22;border-color:#2255ff;}
-  50%{box-shadow:0 0 16px #ff2222,0 0 32px #0044ff,inset 0 0 12px #ff000022;border-color:#ff3333;}
-  75%{box-shadow:0 0 20px #0044ff,0 0 40px #ff2222,inset 0 0 14px #0044ff22;border-color:#4466ff;}
-  100%{box-shadow:0 0 16px #ff2222,0 0 32px #0044ff,inset 0 0 12px #ff000022;border-color:#ff3333;}
-}
-@keyframes polisTextFlash{
-  0%,49%{color:#ff3333;text-shadow:0 0 12px #ff3333,0 0 24px #ff000088;}
-  50%,100%{color:#4488ff;text-shadow:0 0 12px #4488ff,0 0 24px #0044ff88;}
-}
-@keyframes sirenSpin{
-  0%{transform:rotate(0deg);}
-  100%{transform:rotate(360deg);}
-}
-.ob-polis{
-  padding:10px 20px;background:linear-gradient(135deg,#0a000f,#000820);
-  border:2.5px solid #ff3333;color:#ff3333;font-family:'Press Start 2P',monospace;
-  font-size:clamp(8px,2.2vw,11px);cursor:pointer;
-  border-radius:10px;
-  animation:polisGlow 1.2s infinite,polisTextFlash 1.2s infinite;
-  transition:transform .1s;width:210px;position:relative;overflow:hidden;
-}
-.ob-polis:active{transform:scale(0.93);}
-.ob-polis::before{content:'🚨';position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:14px;animation:sirenSpin 1.5s linear infinite;}
-.ob-polis::after{content:'🚨';position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:14px;animation:sirenSpin 1.5s linear infinite reverse;}
-
-/* POLİSLER HUD */
-#polis-hud{position:absolute;top:0;left:0;right:0;height:52px;display:none;justify-content:space-around;align-items:center;background:linear-gradient(180deg,#0a0010f5,transparent);z-index:20;pointer-events:none;padding:0 6px;}
-#polis-hud.show{display:flex;}
-.phi{display:flex;flex-direction:column;align-items:center;gap:1px;}
-.phl{font-size:4.5px;color:#ff4444;letter-spacing:1px;opacity:.9;}
-.phv{font-family:'VT323',monospace;font-size:22px;color:#ff4444;text-shadow:0 0 8px #ff4444;line-height:1;}
-#polis-combo-badge{position:absolute;top:56px;left:50%;transform:translateX(-50%);z-index:21;pointer-events:none;font-family:'VT323',monospace;font-size:22px;color:#ff8800;text-shadow:0 0 12px #ff8800;opacity:0;transition:opacity .3s;}
-#polis-combo-badge.show{opacity:1;}
-#polis-alert{position:absolute;top:56px;left:50%;transform:translateX(-50%);z-index:22;pointer-events:none;font-family:'VT323',monospace;font-size:20px;color:#ff2222;text-shadow:0 0 14px #ff2222;opacity:0;transition:opacity .2s;white-space:nowrap;}
-#polis-alert.show{opacity:1;animation:driftpulse .3s infinite alternate;}
-
-/* POLİSLER controls - only L/R */
-#polis-ctrl{position:absolute;bottom:0;left:0;right:0;height:120px;z-index:20;display:none;align-items:flex-end;justify-content:space-between;padding:0 28px 24px;background:linear-gradient(0deg,#05050af5 60%,transparent);}
-#polis-ctrl.show{display:flex;}
-.polis-steer{width:76px;height:76px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#1c1028,#080014);border:2.5px solid #ff3333;color:#ff5555;font-size:20px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 14px #ff333344,inset 0 0 8px #ff000011;cursor:pointer;user-select:none;-webkit-user-select:none;transition:all .06s;}
-.polis-steer.pressed{background:radial-gradient(circle at 35% 35%,#ff222222,#18000a);box-shadow:0 0 30px #ff3333aa;border-color:#ff9999;transform:scale(0.88);}
-
-/* Siren overlay */
-#siren-overlay{display:none;}
-
-/* Camera shake */
-@keyframes camShake{
-  0%{transform:translate(0,0) rotate(0deg);}
-  15%{transform:translate(-3px,2px) rotate(-0.5deg);}
-  30%{transform:translate(3px,-2px) rotate(0.5deg);}
-  45%{transform:translate(-2px,3px) rotate(-0.3deg);}
-  60%{transform:translate(2px,-1px) rotate(0.3deg);}
-  75%{transform:translate(-1px,2px) rotate(-0.2deg);}
-  100%{transform:translate(0,0) rotate(0deg);}
-}
-#wrap.shake{animation:camShake 0.35s ease-out;}
-
-/* Police intro zoom overlay */
-#polis-intro{position:absolute;inset:0;z-index:200;display:none;align-items:center;justify-content:center;flex-direction:column;gap:16px;background:#000000ee;backdrop-filter:blur(3px);}
-#polis-intro.show{display:flex;}
-@keyframes introZoom{0%{transform:scale(3);opacity:0;}60%{transform:scale(0.97);opacity:1;}80%{transform:scale(1.04);}100%{transform:scale(1);opacity:1;}}
-#polis-intro-text{font-size:clamp(20px,6vw,36px);color:#ff3333;text-shadow:0 0 24px #ff3333,0 0 50px #ff000066;animation:introZoom .9s ease-out forwards;text-align:center;line-height:1.6;}
-@keyframes introSub{0%{opacity:0;transform:translateY(20px);}100%{opacity:1;transform:translateY(0);}}
-#polis-intro-sub{font-family:'VT323',monospace;font-size:clamp(14px,4vw,22px);color:#4488ff;text-shadow:0 0 16px #4488ff;animation:introSub .5s ease-out 0.6s both;text-align:center;}
-@keyframes sirenFlashOverlay{0%,49%{background:#ff000018;}50%,100%{background:#0044ff18;}}
-#polis-intro-flash{position:absolute;inset:0;animation:sirenFlashOverlay 0.4s infinite;pointer-events:none;}
-
-/* Speed streak effect */
-#speed-streaks{position:absolute;inset:0;pointer-events:none;z-index:15;opacity:0;transition:opacity .3s;}
-#speed-streaks.show{opacity:1;}
-</style>
-</head>
-<body>
-<div id="wrap">
-  <canvas id="gc"></canvas>
-
-  <!-- HUD -->
-  <div id="hud">
-    <div class="hi"><span class="hl">SKOR</span><span class="hv" id="sd">0</span></div>
-    <div class="hi"><span class="hl">SEVİYE</span><span class="hv" id="ld">1</span></div>
-    <div class="hi"><span class="hl">SÜRE</span><div id="tbar"><div id="tfill" style="width:100%"></div></div><span class="hv" id="td">60</span></div>
-    <div class="hi"><span class="hl">CAN</span><span class="hv" id="livd">❤❤❤</span></div>
-    <div class="hi"><span class="hl">HIZ</span><span class="hv" id="spd">0</span></div>
-  </div>
-  <div id="keybadge">🔑×0</div>
-  <div id="modebadge"></div>
-  <div id="combobadge"></div>
-  <div id="lanewarn">⚠ ŞERETTEN ÇIKMA!</div>
-  <div id="driftbadge">🔥 DRİFT!</div>
-  <div id="driftscore"></div>
-  <div id="driftbar-wrap">
-    <span id="driftbar-label">DRİFT GÜCÜ</span>
-    <div id="driftbar"><div id="driftbar-fill"></div></div>
-  </div>
-  <div id="driftmode-overlay"></div>
-  <div id="dtbadge"></div>
-  <div id="daytint"></div>
-
-  <!-- POLİSLER HUD -->
-  <div id="polis-hud">
-    <div class="phi"><span class="phl">SKOR</span><span class="phv" id="polis-score-val">0</span></div>
-    <div class="phi"><span class="phl">EN İYİ</span><span class="phv" id="polis-hi-val">0</span></div>
-    <div class="phi"><span class="phl">COMBO</span><span class="phv" id="polis-combo-val">x1</span></div>
-    <div class="phi"><span class="phl">POLİS</span><span class="phv" id="polis-count-val">0</span></div>
-  </div>
-  <div id="polis-combo-badge">🔥 COMBO!</div>
-  <div id="polis-alert">⚠ POLİS YAKLAŞIYOR!</div>
-  <div id="siren-overlay"></div>
-  <div id="speed-streaks"></div>
-
-  <!-- POLİSLER Controls -->
-  <div id="polis-ctrl">
-    <div class="polis-steer" id="pL" onpointerdown="polisInput('L',1)" onpointerup="polisInput('L',0)" onpointerleave="polisInput('L',0)" onpointercancel="polisInput('L',0)">◀</div>
-    <div class="polis-steer" id="pR" onpointerdown="polisInput('R',1)" onpointerup="polisInput('R',0)" onpointerleave="polisInput('R',0)" onpointercancel="polisInput('R',0)">▶</div>
-  </div>
-
-  <!-- POLİSLER Intro -->
-  <div id="polis-intro">
-    <div id="polis-intro-flash"></div>
-    <div id="polis-intro-text">🚨 POLİSLER<br>ARANIYOR! 🚨</div>
-    <div id="polis-intro-sub">Kaçmaya çalış!</div>
-  </div>
-
-  <!-- POLİSLER Game Over -->
-  <div class="ov" id="polis-go" style="display:none">
-    <div class="ot" style="color:#ff3333;text-shadow:0 0 18px #ff3333,0 0 38px #ff000066;">🚨 YAKALANDIN!</div>
-    <div class="os" id="polis-go-msg" style="color:#ff8888;">Skor: 0</div>
-    <div class="os" id="polis-go-hi" style="color:#f5c518;font-size:6px;"></div>
-    <button class="ob" onclick="restartPolisMode()" style="border-color:#ff3333;color:#ff3333;box-shadow:0 0 14px #ff3333;">↺ TEKRAR</button>
-    <button class="ob" onclick="goToMenu()" style="border-color:#a78bfa;color:#a78bfa;box-shadow:0 0 10px #a78bfa;font-size:7px;margin-top:4px;padding:7px 16px;">🏠 MENÜ</button>
-  </div>
-
-  <!-- Controls -->
-  <div id="ctrl">
-    <div id="sg">
-      <div class="bsteer" id="bL" onpointerdown="pd(event,'L',1)" onpointerup="pd(event,'L',0)" onpointerleave="pd(event,'L',0)" onpointercancel="pd(event,'L',0)">◀</div>
-      <div class="bsteer" id="bR" onpointerdown="pd(event,'R',1)" onpointerup="pd(event,'R',0)" onpointerleave="pd(event,'R',0)" onpointercancel="pd(event,'R',0)">▶</div>
-    </div>
-    <div id="pg" style="flex-direction:row;gap:9px;align-items:flex-end;">
-      <div class="bbrake" id="bB" onpointerdown="pd(event,'B',1)" onpointerup="pd(event,'B',0)" onpointerleave="pd(event,'B',0)" onpointercancel="pd(event,'B',0)">
-        <span class="ico">🛑</span><span class="plbl">FREN</span>
-      </div>
-      <div class="bgas" id="bG" onpointerdown="pd(event,'G',1)" onpointerup="pd(event,'G',0)" onpointerleave="pd(event,'G',0)" onpointercancel="pd(event,'G',0)">
-        <span class="ico">🔥</span><span class="plbl">GAZ</span>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- Start: Main Menu -->
-  <div class="ov" id="sto">
-    <div class="ot" style="font-size:clamp(11px,3.2vw,18px);">🚗 PARK<br>USTASI PRO</div>
-    <div class="os">ARAÇ RENGİNİ SEÇ:</div>
-    <div id="colorpicker"></div>
-    <div style="display:flex;flex-direction:column;align-items:center;gap:9px;margin-top:6px;width:100%;">
-      <button class="ob" onclick="showScreen('sto',false);startGame('park')" style="border-color:#00ffcc;color:#00ffcc;box-shadow:0 0 14px #00ffcc;font-size:clamp(7px,2vw,9px);padding:9px 18px;width:210px;">🅿 PARK ETME MODU</button>
-      <button class="ob" onclick="showScreen('sto',false);showScreen('driftmenu',true)" style="border-color:#ff3e6c;color:#ff3e6c;box-shadow:0 0 14px #ff3e6c;font-size:clamp(7px,2vw,9px);padding:9px 18px;width:210px;">🔥 DRİFT MODU ▶</button>
-      <button class="ob-polis" onclick="showScreen('sto',false);startPolisMode()">POLİSLER</button>
-    </div>
-    <div style="font-family:'VT323',monospace;font-size:13px;color:#ffffff44;letter-spacing:2px;margin-top:4px;">Fatih Altunkaya</div>
-  </div>
-
-  <!-- Drift Setup Menu -->
-  <div class="ov" id="driftmenu" style="display:none;gap:8px;">
-    <div class="ot" style="font-size:clamp(11px,3vw,16px);color:#ff3e6c;text-shadow:0 0 18px #ff3e6c;">🔥 DRİFT KURULUM</div>
-    <div style="display:flex;flex-direction:column;align-items:center;gap:5px;width:100%;">
-      <div style="font-size:5px;color:#ff3e6c;letter-spacing:2px;">📍 HARİTA</div>
-      <div style="display:flex;gap:7px;">
-        <button class="selopt" id="map-open" onclick="driftSel('map','open')">🏜 SERBEST<br>ALAN</button>
-        <button class="selopt" id="map-carpark" onclick="driftSel('map','carpark')">🏢 OTOPARK</button>
-      </div>
-    </div>
-    <div style="display:flex;flex-direction:column;align-items:center;gap:5px;width:100%;">
-      <div style="font-size:5px;color:#ff3e6c;letter-spacing:2px;">🕐 ZAMAN</div>
-      <div style="display:flex;gap:7px;">
-        <button class="selopt" id="tod-day" onclick="driftSel('tod','day')">☀ GÜNDÜZ</button>
-        <button class="selopt" id="tod-night" onclick="driftSel('tod','night')">🌙 GECE</button>
-      </div>
-    </div>
-    <div style="display:flex;flex-direction:column;align-items:center;gap:5px;width:100%;">
-      <div style="font-size:5px;color:#ff3e6c;letter-spacing:2px;">⚙ ÇEKIŞ SİSTEMİ</div>
-      <div style="display:flex;gap:5px;flex-wrap:wrap;justify-content:center;max-width:240px;">
-        <button class="selopt dtbtn" id="dt-fwd" onclick="driftSel('dt','fwd')">FWD<br><span style="font-size:4px;color:#aaa;">Ön Çeker</span></button>
-        <button class="selopt dtbtn" id="dt-rwd" onclick="driftSel('dt','rwd')">RWD<br><span style="font-size:4px;color:#aaa;">Arka Çeker</span></button>
-        <button class="selopt dtbtn" id="dt-awd" onclick="driftSel('dt','awd')">AWD<br><span style="font-size:4px;color:#aaa;">Tam Çeker</span></button>
-        <button class="selopt dtbtn" id="dt-4wd" onclick="driftSel('dt','4wd')">4WD<br><span style="font-size:4px;color:#aaa;">4x4 Kilitli</span></button>
-      </div>
-      <div id="dtdesc" style="font-size:4.5px;color:#ff880088;text-align:center;max-width:220px;min-height:14px;line-height:1.7;"></div>
-    </div>
-    <div style="display:flex;gap:10px;margin-top:4px;">
-      <button class="ob" onclick="showScreen('driftmenu',false);showScreen('sto',true)" style="border-color:#a78bfa;color:#a78bfa;font-size:7px;padding:7px 14px;">◀ GERİ</button>
-      <button class="ob" onclick="launchDrift()" style="border-color:#ff3e6c;color:#ff3e6c;font-size:8px;padding:9px 18px;">▶ BAŞLA!</button>
-    </div>
-  </div>
-  <!-- Level Up -->
-  <div class="ov" id="luo" style="display:none">
-    <div class="ot" id="luot">⭐ SEVİYE<br>ATLANDI!</div>
-    <div class="stars" id="strs">⭐⭐⭐</div>
-    <div class="os" id="lum">Mükemmel!</div>
-    <div class="os" id="nextlvlinfo" style="color:#a78bfa;margin-top:4px;font-size:6px;"></div>
-    <button class="ob" onclick="nextLevel()">▶ DEVAM</button>
-  </div>
-  <!-- Reward -->
-  <div class="ov" id="rwo" style="display:none">
-    <div class="ot">🔑 ANAHTAR<br>ALINDI!</div>
-    <div class="os" id="rwm">Şimdi park yerine git!</div>
-    <button class="ob" onclick="closeReward()">▶ DEVAM</button>
-  </div>
-  <!-- Crash -->
-  <div class="ov" id="cro" style="display:none">
-    <div class="ot">💥 ÇARPIŞTI!</div>
-    <div class="os" id="crm">Araç hasar gördü!</div>
-    <button class="ob" onclick="restartLevel()">↺ TEKRAR</button>
-  </div>
-  <!-- Game Over -->
-  <div class="ov" id="goo" style="display:none">
-    <div class="ot">GAME<br>OVER</div>
-    <div class="os" id="gom">Skor: 0</div>
-    <button class="ob" onclick="restartGame()">↺ YENİDEN</button>
-    <button class="ob" onclick="goToMenu()" style="border-color:#a78bfa;color:#a78bfa;box-shadow:0 0 10px #a78bfa;font-size:7px;margin-top:4px;padding:7px 16px;">🏠 MENÜ</button>
-  </div>
-</div>
-
-<script>
 // ── INPUT
 const I={L:0,R:0,G:0,B:0,H:0};
 function pd(e,k,v){e.preventDefault();e.stopPropagation();I[k]=v;const el=document.getElementById({L:'bL',R:'bR',G:'bG',B:'bB',H:'bH'}[k]);if(el)el.classList.toggle('pressed',!!v);}
@@ -1470,7 +1124,7 @@ function draw(){
   if(LANE_PATH.length)drawLanePath(mode===8);
 
   // Tire marks — skip near-invisible
-  for(const t of tmarks){if(t.l<0.08)continue;ctx.globalAlpha=t.l*.44;ctx.fillStyle=mode===11?'#6699cc':(mode===12?'#333':'#000');const ts=mode===12?4:2;ctx.fillRect(~~t.x-ts/2,~~t.y-ts/2,ts+2,ts+2);}ctx.globalAlpha=1;
+  for(const t of tmarks){if(t.l<0.12)continue;ctx.globalAlpha=t.l*.44;ctx.fillStyle=mode===11?'#6699cc':(mode===12?'#333':'#000');const ts=mode===12?4:2;ctx.fillRect(~~t.x-ts/2,~~t.y-ts/2,ts+2,ts+2);}ctx.globalAlpha=1;
 
   const c=cfg(LVL);
   const locked=c.needKey&&KEYS_COLLECTED<c.numKeys;
@@ -1646,7 +1300,7 @@ function update(){
       document.getElementById('driftbadge').classList.add('show');
       document.getElementById('driftbadge').textContent='🔥 DRİFT!';
 
-      if(AF%5===0&&parts.length<50){
+      if(AF%8===0&&parts.length<35){
         const co=rcorners(car.x,car.y,car.angle,CW,CH);
         const wheels=DRIFT_DT==='fwd'?[0,1]:DRIFT_DT==='rwd'?[2,3]:[0,1,2,3];
         for(const wi of wheels){
@@ -1703,7 +1357,7 @@ function update(){
     document.getElementById('spd').textContent=~~(speed_px*38);
     // Parçacık güncelle — max 80 zorunlu
     for(let i=parts.length-1;i>=0;i--){const p=parts[i];p.x+=p.vx;p.y+=p.vy;p.vx*=.90;p.vy*=.90;p.l-=p.d;if(p.l<=0)parts.splice(i,1);}
-    if(parts.length>50)parts.splice(0,parts.length-50);
+    if(parts.length>35)parts.splice(0,parts.length-35);
     // Lastik izi — max 120
     tmarks=tmarks.filter(t=>(t.l-=.010)>0);
     if(tmarks.length>120)tmarks.length=120;
@@ -2083,7 +1737,7 @@ function drawPolisPlayer(){
   const dg=POLIS_DRIFT_ACTIVE&&POLIS_DRIFT_INTENSITY>0.15;
   drawCar(p.x,p.y,p.angle,p.color,p.roof,1,true,dg);
   // Drift smoke
-  if(dg&&POLIS_AF%3===0){
+  if(dg&&POLIS_AF%6===0&&POLIS_PARTS.length<70){
     const co=rcorners(p.x,p.y,p.angle,CW,CH);
     for(const wi of[2,3]){
       const sa=Math.atan2(p.vy,p.vx)+Math.PI+(Math.random()-.5)*1.4;
@@ -2345,11 +1999,11 @@ function updatePolisLoop(){
     const p=POLIS_PARTS[i];p.x+=p.vx;p.y+=p.vy;p.vx*=.90;p.vy*=.90;p.l-=p.d;
     if(p.l<=0)POLIS_PARTS.splice(i,1);
   }
-  if(POLIS_PARTS.length>180)POLIS_PARTS.splice(0,POLIS_PARTS.length-180);
+  if(POLIS_PARTS.length>80)POLIS_PARTS.splice(0,POLIS_PARTS.length-80);
 
   // Tire marks
-  POLIS_TMARKS=POLIS_TMARKS.filter(t=>(t.l-=.008)>0);
-  if(POLIS_TMARKS.length>180)POLIS_TMARKS.length=180;
+  POLIS_TMARKS=POLIS_TMARKS.filter(t=>(t.l-=.012)>0);
+  if(POLIS_TMARKS.length>60)POLIS_TMARKS.length=60;
 
   // HUD
   updPolisHUD();
@@ -2543,6 +2197,3 @@ driftSel('map','open');
 driftSel('tod','night');
 driftSel('dt','rwd');
 resize();loop();updHUD();
-</script>
-</body>
-</html>

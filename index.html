@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>🚗 PARK USTASI PRO</title>
+<link rel="stylesheet" href="css/common-styles.css">
+<link rel="stylesheet" href="css/parking-styles.css">
+<link rel="stylesheet" href="css/drift-styles.css">
+<link rel="stylesheet" href="css/polis-styles.css">
+</head>
+<body>
+<div id="wrap">
+  <canvas id="gc"></canvas>
+
+  <!-- HUD -->
+  <div id="hud">
+    <div class="hi"><span class="hl">SKOR</span><span class="hv" id="sd">0</span></div>
+    <div class="hi"><span class="hl">SEVİYE</span><span class="hv" id="ld">1</span></div>
+    <div class="hi"><span class="hl">SÜRE</span><div id="tbar"><div id="tfill" style="width:100%"></div></div><span class="hv" id="td">60</span></div>
+    <div class="hi"><span class="hl">CAN</span><span class="hv" id="livd">❤❤❤</span></div>
+    <div class="hi"><span class="hl">HIZ</span><span class="hv" id="spd">0</span></div>
+  </div>
+  <div id="keybadge">🔑×0</div>
+  <div id="modebadge"></div>
+  <div id="combobadge"></div>
+  <div id="lanewarn">⚠ ŞERETTEN ÇIKMA!</div>
+  <div id="driftbadge">🔥 DRİFT!</div>
+  <div id="driftscore"></div>
+  <div id="driftbar-wrap">
+    <span id="driftbar-label">DRİFT GÜCÜ</span>
+    <div id="driftbar"><div id="driftbar-fill"></div></div>
+  </div>
+  <div id="driftmode-overlay"></div>
+  <div id="dtbadge"></div>
+  <div id="daytint"></div>
+
+  <!-- POLİSLER HUD -->
+  <div id="polis-hud">
+    <div class="phi"><span class="phl">SKOR</span><span class="phv" id="polis-score-val">0</span></div>
+    <div class="phi"><span class="phl">EN İYİ</span><span class="phv" id="polis-hi-val">0</span></div>
+    <div class="phi"><span class="phl">COMBO</span><span class="phv" id="polis-combo-val">x1</span></div>
+    <div class="phi"><span class="phl">POLİS</span><span class="phv" id="polis-count-val">0</span></div>
+  </div>
+  <div id="polis-combo-badge">🔥 COMBO!</div>
+  <div id="polis-alert">⚠ POLİS YAKLAŞIYOR!</div>
+  <div id="siren-overlay"></div>
+  <div id="speed-streaks"></div>
+
+  <!-- POLİSLER Controls -->
+  <div id="polis-ctrl">
+    <div class="polis-steer" id="pL" onpointerdown="polisInput('L',1)" onpointerup="polisInput('L',0)" onpointerleave="polisInput('L',0)" onpointercancel="polisInput('L',0)">◀</div>
+    <div class="polis-steer" id="pR" onpointerdown="polisInput('R',1)" onpointerup="polisInput('R',0)" onpointerleave="polisInput('R',0)" onpointercancel="polisInput('R',0)">▶</div>
+  </div>
+
+  <!-- POLİSLER Intro -->
+  <div id="polis-intro">
+    <div id="polis-intro-flash"></div>
+    <div id="polis-intro-text">🚨 POLİSLER<br>ARANIYOR! 🚨</div>
+    <div id="polis-intro-sub">Kaçmaya çalış!</div>
+  </div>
+
+  <!-- POLİSLER Game Over -->
+  <div class="ov" id="polis-go" style="display:none">
+    <div class="ot" style="color:#ff3333;text-shadow:0 0 18px #ff3333,0 0 38px #ff000066;">🚨 YAKALANDIN!</div>
+    <div class="os" id="polis-go-msg" style="color:#ff8888;">Skor: 0</div>
+    <div class="os" id="polis-go-hi" style="color:#f5c518;font-size:6px;"></div>
+    <button class="ob" onclick="restartPolisMode()" style="border-color:#ff3333;color:#ff3333;box-shadow:0 0 14px #ff3333;">↺ TEKRAR</button>
+    <button class="ob" onclick="goToMenu()" style="border-color:#a78bfa;color:#a78bfa;box-shadow:0 0 10px #a78bfa;font-size:7px;margin-top:4px;padding:7px 16px;">🏠 MENÜ</button>
+  </div>
+
+  <!-- Controls -->
+  <div id="ctrl">
+    <div id="sg">
+      <div class="bsteer" id="bL" onpointerdown="pd(event,'L',1)" onpointerup="pd(event,'L',0)" onpointerleave="pd(event,'L',0)" onpointercancel="pd(event,'L',0)">◀</div>
+      <div class="bsteer" id="bR" onpointerdown="pd(event,'R',1)" onpointerup="pd(event,'R',0)" onpointerleave="pd(event,'R',0)" onpointercancel="pd(event,'R',0)">▶</div>
+    </div>
+    <div id="pg" style="flex-direction:row;gap:9px;align-items:flex-end;">
+      <div class="bbrake" id="bB" onpointerdown="pd(event,'B',1)" onpointerup="pd(event,'B',0)" onpointerleave="pd(event,'B',0)" onpointercancel="pd(event,'B',0)">
+        <span class="ico">🛑</span><span class="plbl">FREN</span>
+      </div>
+      <div class="bgas" id="bG" onpointerdown="pd(event,'G',1)" onpointerup="pd(event,'G',0)" onpointerleave="pd(event,'G',0)" onpointercancel="pd(event,'G',0)">
+        <span class="ico">🔥</span><span class="plbl">GAZ</span>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Start: Main Menu -->
+  <div class="ov" id="sto">
+    <div class="ot" style="font-size:clamp(11px,3.2vw,18px);">🚗 PARK<br>USTASI PRO</div>
+    <div class="os">ARAÇ RENGİNİ SEÇ:</div>
+    <div id="colorpicker"></div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:9px;margin-top:6px;width:100%;">
+      <button class="ob" onclick="showScreen('sto',false);startGame('park')" style="border-color:#00ffcc;color:#00ffcc;box-shadow:0 0 14px #00ffcc;font-size:clamp(7px,2vw,9px);padding:9px 18px;width:210px;">🅿 PARK ETME MODU</button>
+      <button class="ob" onclick="showScreen('sto',false);showScreen('driftmenu',true)" style="border-color:#ff3e6c;color:#ff3e6c;box-shadow:0 0 14px #ff3e6c;font-size:clamp(7px,2vw,9px);padding:9px 18px;width:210px;">🔥 DRİFT MODU ▶</button>
+      <button class="ob-polis" onclick="showScreen('sto',false);startPolisMode()">POLİSLER</button>
+    </div>
+    <div style="font-family:'VT323',monospace;font-size:13px;color:#ffffff44;letter-spacing:2px;margin-top:4px;">Fatih Altunkaya</div>
+  </div>
+
+  <!-- Drift Setup Menu -->
+  <div class="ov" id="driftmenu" style="display:none;gap:8px;">
+    <div class="ot" style="font-size:clamp(11px,3vw,16px);color:#ff3e6c;text-shadow:0 0 18px #ff3e6c;">🔥 DRİFT KURULUM</div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:5px;width:100%;">
+      <div style="font-size:5px;color:#ff3e6c;letter-spacing:2px;">📍 HARİTA</div>
+      <div style="display:flex;gap:7px;">
+        <button class="selopt" id="map-open" onclick="driftSel('map','open')">🏜 SERBEST<br>ALAN</button>
+        <button class="selopt" id="map-carpark" onclick="driftSel('map','carpark')">🏢 OTOPARK</button>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:5px;width:100%;">
+      <div style="font-size:5px;color:#ff3e6c;letter-spacing:2px;">🕐 ZAMAN</div>
+      <div style="display:flex;gap:7px;">
+        <button class="selopt" id="tod-day" onclick="driftSel('tod','day')">☀ GÜNDÜZ</button>
+        <button class="selopt" id="tod-night" onclick="driftSel('tod','night')">🌙 GECE</button>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:5px;width:100%;">
+      <div style="font-size:5px;color:#ff3e6c;letter-spacing:2px;">⚙ ÇEKIŞ SİSTEMİ</div>
+      <div style="display:flex;gap:5px;flex-wrap:wrap;justify-content:center;max-width:240px;">
+        <button class="selopt dtbtn" id="dt-fwd" onclick="driftSel('dt','fwd')">FWD<br><span style="font-size:4px;color:#aaa;">Ön Çeker</span></button>
+        <button class="selopt dtbtn" id="dt-rwd" onclick="driftSel('dt','rwd')">RWD<br><span style="font-size:4px;color:#aaa;">Arka Çeker</span></button>
+        <button class="selopt dtbtn" id="dt-awd" onclick="driftSel('dt','awd')">AWD<br><span style="font-size:4px;color:#aaa;">Tam Çeker</span></button>
+        <button class="selopt dtbtn" id="dt-4wd" onclick="driftSel('dt','4wd')">4WD<br><span style="font-size:4px;color:#aaa;">4x4 Kilitli</span></button>
+      </div>
+      <div id="dtdesc" style="font-size:4.5px;color:#ff880088;text-align:center;max-width:220px;min-height:14px;line-height:1.7;"></div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:4px;">
+      <button class="ob" onclick="showScreen('driftmenu',false);showScreen('sto',true)" style="border-color:#a78bfa;color:#a78bfa;font-size:7px;padding:7px 14px;">◀ GERİ</button>
+      <button class="ob" onclick="launchDrift()" style="border-color:#ff3e6c;color:#ff3e6c;font-size:8px;padding:9px 18px;">▶ BAŞLA!</button>
+    </div>
+  </div>
+  <!-- Level Up -->
+  <div class="ov" id="luo" style="display:none">
+    <div class="ot" id="luot">⭐ SEVİYE<br>ATLANDI!</div>
+    <div class="stars" id="strs">⭐⭐⭐</div>
+    <div class="os" id="lum">Mükemmel!</div>
+    <div class="os" id="nextlvlinfo" style="color:#a78bfa;margin-top:4px;font-size:6px;"></div>
+    <button class="ob" onclick="nextLevel()">▶ DEVAM</button>
+  </div>
+  <!-- Reward -->
+  <div class="ov" id="rwo" style="display:none">
+    <div class="ot">🔑 ANAHTAR<br>ALINDI!</div>
+    <div class="os" id="rwm">Şimdi park yerine git!</div>
+    <button class="ob" onclick="closeReward()">▶ DEVAM</button>
+  </div>
+  <!-- Crash -->
+  <div class="ov" id="cro" style="display:none">
+    <div class="ot">💥 ÇARPIŞTI!</div>
+    <div class="os" id="crm">Araç hasar gördü!</div>
+    <button class="ob" onclick="restartLevel()">↺ TEKRAR</button>
+  </div>
+  <!-- Game Over -->
+  <div class="ov" id="goo" style="display:none">
+    <div class="ot">GAME<br>OVER</div>
+    <div class="os" id="gom">Skor: 0</div>
+    <button class="ob" onclick="restartGame()">↺ YENİDEN</button>
+    <button class="ob" onclick="goToMenu()" style="border-color:#a78bfa;color:#a78bfa;box-shadow:0 0 10px #a78bfa;font-size:7px;margin-top:4px;padding:7px 16px;">🏠 MENÜ</button>
+  </div>
+</div>
+
+<!-- Module imports (when refactoring complete) -->
+<!-- <script src="modules/common.js"></script> -->
+<!-- <script src="modules/particles.js"></script> -->
+<!-- <script src="modules/parking.js"></script> -->
+<!-- <script src="modules/drift.js"></script> -->
+<!-- <script src="modules/polis.js"></script> -->
+
+<!-- Temporary: Main script (to be split later) -->
+<script src="script.js"></script>
+</body>
+</html>

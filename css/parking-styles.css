@@ -1,0 +1,74 @@
+/* HUD */
+#hud{position:absolute;top:0;left:0;right:0;height:48px;display:flex;justify-content:space-around;align-items:center;background:linear-gradient(180deg,#0a0a1ef5,transparent);z-index:20;pointer-events:none;padding:0 6px;}
+.hi{display:flex;flex-direction:column;align-items:center;gap:1px;}
+.hl{font-size:4.5px;color:var(--neon);letter-spacing:1px;opacity:.8;}
+.hv{font-family:'VT323',monospace;font-size:20px;color:var(--neon3);text-shadow:0 0 7px var(--neon3);line-height:1;}
+#tbar{width:52px;height:3px;background:#ffffff22;}
+#tfill{height:100%;background:linear-gradient(90deg,var(--neon),var(--neon3));box-shadow:0 0 4px var(--neon);transition:width .1s;}
+
+/* Key badge */
+#keybadge{position:absolute;top:52px;right:8px;z-index:21;pointer-events:none;font-family:'VT323',monospace;font-size:22px;color:#f5c518;text-shadow:0 0 10px #f5c518;transition:transform .2s;}
+#keybadge.bounce{animation:kbounce .3s;}
+
+/* Mode badge */
+#modebadge{position:absolute;top:52px;left:8px;z-index:21;pointer-events:none;font-size:5px;color:var(--neon4);text-shadow:0 0 6px var(--neon4);letter-spacing:.5px;}
+
+/* Combo badge */
+#combobadge{position:absolute;top:70px;left:50%;transform:translateX(-50%);z-index:21;pointer-events:none;font-family:'VT323',monospace;font-size:18px;color:#ff6600;text-shadow:0 0 10px #ff6600;opacity:0;transition:opacity .3s;}
+#combobadge.show{opacity:1;}
+
+/* Controls */
+#ctrl{position:absolute;bottom:0;left:0;right:0;height:200px;z-index:20;display:flex;align-items:flex-end;justify-content:space-between;padding:0 16px 16px;background:linear-gradient(0deg,#05050af5 55%,transparent);}
+.bsteer{width:64px;height:64px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#1c2738,#08101c);border:2.5px solid var(--neon);color:var(--neon);font-size:18px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 12px #00ffcc44,inset 0 0 8px #00ffcc11;cursor:pointer;user-select:none;-webkit-user-select:none;transition:all .06s;}
+.bsteer.pressed{background:radial-gradient(circle at 35% 35%,#00ffcc22,#001812);box-shadow:0 0 26px #00ffccaa;border-color:#aaffee;transform:scale(0.89);}
+#sg{display:flex;flex-direction:row;gap:12px;align-items:flex-end;}
+#pg{display:flex;flex-direction:column;align-items:center;gap:9px;}
+.bgas{width:68px;height:120px;border-radius:10px 10px 16px 16px;background:linear-gradient(180deg,#1a080c,#280010);border:2.5px solid var(--neon2);color:var(--neon2);font-family:'Press Start 2P',monospace;font-size:7px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:10px;gap:5px;box-shadow:0 0 14px #ff3e6c44,inset 0 0 10px #ff3e6c0e;cursor:pointer;user-select:none;-webkit-user-select:none;transition:all .06s;position:relative;overflow:hidden;}
+.bgas::after{content:'';position:absolute;top:8px;left:10px;width:55%;height:22%;background:radial-gradient(ellipse,#ff3e6c1a,transparent);border-radius:50%;}
+.bgas .ico{font-size:24px;line-height:1;}
+.bgas.pressed{background:linear-gradient(180deg,#ff3e6c2a,#380010);box-shadow:0 0 30px #ff3e6caa;border-color:#ff9999;transform:scale(0.92) translateY(3px);}
+.bbrake{width:68px;height:58px;border-radius:8px 8px 14px 14px;background:linear-gradient(180deg,#181200,#201800);border:2.5px solid var(--neon3);color:var(--neon3);font-family:'Press Start 2P',monospace;font-size:7px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:8px;gap:3px;box-shadow:0 0 12px #f5c51844,inset 0 0 8px #f5c5180e;cursor:pointer;user-select:none;-webkit-user-select:none;transition:all .06s;position:relative;overflow:hidden;}
+.bbrake::after{content:'';position:absolute;top:5px;left:8px;width:55%;height:28%;background:radial-gradient(ellipse,#f5c5181a,transparent);border-radius:50%;}
+.bbrake .ico{font-size:16px;line-height:1;}
+.bbrake.pressed{background:linear-gradient(180deg,#f5c51824,#2a1c00);box-shadow:0 0 26px #f5c518aa;border-color:#ffe877;transform:scale(0.92) translateY(3px);}
+.plbl{font-size:6px;letter-spacing:0.4px;}
+
+/* Lane warning */
+#lanewarn{position:absolute;top:52px;left:50%;transform:translateX(-50%);z-index:25;pointer-events:none;font-size:7px;color:#ff3e6c;text-shadow:0 0 8px #ff3e6c;opacity:0;transition:opacity .2s;text-align:center;}
+#lanewarn.show{opacity:1;}
+
+/* Car color picker */
+#colorpicker{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;max-width:220px;}
+.cpbtn{width:24px;height:24px;border-radius:50%;border:2px solid transparent;cursor:pointer;transition:all .15s;}
+.cpbtn.selected{border-color:#fff;transform:scale(1.25);box-shadow:0 0 10px #fff8;}
+.cpbtn:active{transform:scale(0.9);}
+
+/* Difficulty badge */
+#diffbadge{position:absolute;top:52px;right:8px;z-index:21;pointer-events:none;}
+
+/* Level type label */
+#lvltypelabel{position:absolute;top:0;left:0;right:0;height:48px;pointer-events:none;z-index:19;display:flex;align-items:center;justify-content:center;}
+
+/* Selection option buttons */
+.selopt{background:transparent;border:1.5px solid #ff3e6c44;color:#ff3e6c88;font-family:'Press Start 2P',monospace;font-size:6px;padding:7px 10px;cursor:pointer;transition:all .12s;line-height:1.6;text-align:center;min-width:68px;}
+.selopt:active{transform:scale(0.93);}
+.selopt.active{border-color:#ff3e6c;color:#ff3e6c;background:#ff3e6c18;box-shadow:0 0 12px #ff3e6c66;}
+.dtbtn{min-width:52px;font-size:5.5px;}
+
+/* Day sky tint */
+#daytint{position:absolute;inset:0;pointer-events:none;z-index:17;opacity:0;background:linear-gradient(180deg,#87ceeb22 0%,transparent 40%);transition:opacity .5s;}
+#daytint.show{opacity:1;}
+
+/* Parking overlays */
+#luo .ot{color:var(--neon3);text-shadow:0 0 18px var(--neon3),0 0 38px var(--neon3);}
+#luo .ob{border-color:var(--neon3);color:var(--neon3);box-shadow:0 0 12px var(--neon3);}
+#cro .ot{color:var(--neon2);text-shadow:0 0 18px var(--neon2),0 0 38px var(--neon2);}
+#cro .ob{border-color:var(--neon2);color:var(--neon2);}
+#goo .ot{color:var(--neon2);text-shadow:0 0 18px var(--neon2),0 0 38px var(--neon2);}
+#goo .ob{border-color:var(--neon2);color:var(--neon2);}
+#rwo .ot{color:var(--neon4);text-shadow:0 0 18px var(--neon4),0 0 38px var(--neon4);}
+#rwo .ob{border-color:var(--neon4);color:var(--neon4);box-shadow:0 0 12px var(--neon4);}
+
+.stars{font-size:22px;display:flex;gap:7px;}
+.key-collect-msg{font-size:8px;color:#f5c518;text-shadow:0 0 10px #f5c518;animation:kpop .6s forwards;}
+@keyframes kpop{0%{opacity:1;transform:translateY(0) scale(1.5)}100%{opacity:0;transform:translateY(-40px) scale(1)}}
