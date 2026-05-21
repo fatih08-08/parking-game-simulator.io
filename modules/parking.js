@@ -1168,12 +1168,12 @@ function triggerCrash(){
   if(car.crashed)return;
   car.crashed=true;spawnCrash(car.x,car.y);cflash=36;LIVES--;COMBO=0;updHUD();clearInterval(tInt);
   document.getElementById('crm').textContent='Araç hasar gördü!';
-  setTimeout(()=>LIVES<=0?showOv('goo'):showOv('cro'),900);
+  setTimeout(()=>LIVES<=0?showScreen('goo'):showScreen('cro'),900);
 }
 function triggerTimeout(){
   clearInterval(tInt);LIVES--;COMBO=0;updHUD();
   document.getElementById('crm').textContent='Süre doldu!';
-  setTimeout(()=>LIVES<=0?showOv('goo'):showOv('cro'),400);
+  setTimeout(()=>LIVES<=0?showScreen('goo'):showScreen('cro'),400);
 }
 function triggerPark(){
   pflash=52;spawnPark(car.x,car.y);clearInterval(tInt);
@@ -1195,7 +1195,4 @@ function triggerPark(){
     if(!isDrift&&laneScore>0)msg+=`\nŞerit: +${lb}`;
     if(COMBO>1)msg+=`\nCombo x${COMBO}: +${cb}`;
     document.getElementById('lum').textContent=msg;
-    showOv('luo');
-  },1100);
-}
-
+    showScreen('luo',true);

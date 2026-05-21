@@ -79,6 +79,9 @@ function showScreen(id,show){
   const el=document.getElementById(id);
   if(el)el.style.display=show?'flex':'none';
 }
+function showOv(id){
+  showScreen(id,true);
+}
 
 function shade(h,a){let n=parseInt(h.slice(1),16);const r=Math.min(255,Math.max(0,((n>>16)&255)+a)),g=Math.min(255,Math.max(0,((n>>8)&255)+a)),b=Math.min(255,Math.max(0,(n&255)+a));return`#${((r<<16)|(g<<8)|b).toString(16).padStart(6,'0')}`;}
 function dist(ax,ay,bx,by){return Math.hypot(bx-ax,by-ay);}
